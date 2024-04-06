@@ -122,6 +122,3 @@ class MapCreation:
         print(response.json())
         return response
 
-test_mapcreation = MapCreation()
-test_mapcreation.generate()
-test_mapcreation.post()

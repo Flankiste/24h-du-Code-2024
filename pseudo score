@@ -1,0 +1,22 @@
+#joueur
+
+score : pour le classement final en points
+
+compteur = compte les coups
+
+1 coup = une coordonée pas 0 dans le vect acc
+
+récupérer toute les solutions des équipes pour cette map
+    get/api/score
+
+récupérer compteur.plus_rapide
+
+score équipe compteur plus_rapide = 0 points
+
+score équipe x = compteur - compteur.plus_rapide
+
+récupérer score_dernière_équipe qui a résolu
+
+if échec : pas de donné ou collision
+    
+    score équipe_echec = 5 + 2 * score_dernière_équipe
