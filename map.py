@@ -114,7 +114,7 @@ class Map:
         Retour:
             bool: True si la case est solide, False sinon.
         """
-        return self.map[x, y, z] != ESPACE
+        return not (self.map[x, y, z] == ESPACE or self.map[x, y, z] == DESTINATION)
 
 """
 Exemple de la classe Map
