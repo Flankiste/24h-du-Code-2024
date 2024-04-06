@@ -6,7 +6,7 @@ from collections import defaultdict
 
 config = json.load(open("config.json"))
 
-class Map:
+class MapCreation:
     def __init__(self, seed = random.randint(0, 1000000)):
         self.seed = seed
         self.limit = 25
@@ -17,10 +17,10 @@ class Map:
             base_size + int(random.random()*variation), 
             base_size + int(random.random()*variation), 
             base_size + int(random.random()*variation)
-            )   
+        )
         self.N =  self.dimensions[0]*self.dimensions[1]*self.dimensions[2]
         self.start : int
-        self.grid = [[[ 'AAA' for _ in range(self.dimensions[2])] for _ in range(self.dimensions[1])] for _ in range(self.dimensions[0])]
+        self.grid = [[['AAA' for _ in range(self.dimensions[2])] for _ in range(self.dimensions[1])] for _ in range(self.dimensions[0])]
     
     def init_quantities(self): 
         quantity = {
@@ -98,7 +98,7 @@ class Map:
         print("Map generated")
         
     def save(self):
-        with open(f"map_{self.seed}.txt", "a") as file:
+        with open(f"maps_txt/map_{self.seed}.txt", "a") as file:
             self.grid = np.transpose(self.grid, (1,0,2))
             file.write(f"MAP {self.dimensions[0]} {self.dimensions[1]} {self.dimensions[2]}\n")
             for i in range(self.dimensions[2]):
@@ -110,7 +110,7 @@ class Map:
             file.write(f"START {self.start[0]} {self.start[1]} {self.start[2]}")
             print(f"Map saved as map_{self.seed}.txt")
         
-        with open(f"map_{self.seed}.txt", "r") as file:
+        with open(f"maps_txt/map_{self.seed}.txt", "r") as file:
             return file.read()
     
     def post(self):
@@ -121,3 +121,7 @@ class Map:
         response = requests.post(url, headers=headers, data=data)
         print(response.json())
         return response
+
+test_mapcreation = MapCreation()
+test_mapcreation.generate()
+test_mapcreation.post()

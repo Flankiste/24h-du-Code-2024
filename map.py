@@ -1,5 +1,6 @@
 import requests
 import numpy as np
+import json
 
 
 ESPACE = 0
@@ -42,6 +43,7 @@ CODE_CASE_STRING_INT = {
     "H": CHECKPOINT_4
 }
 
+config = json.load(open("config.json"))
 
 
 class Map:
@@ -134,7 +136,7 @@ def get_map_api(id_map: int = -1):
     if id_map >= 0:
         url += "/" + str(id_map)
     
-    headers = {"Authorization" : "TOKEN 2e214b6a84dfda39d009126bf4fd045a2d3c28f9"}
+    headers = {"Authorization" : f"TOKEN {config["TokenServer"]}"}
     
     reponse = requests.get(url, headers=headers)
     print("Récupération de la carte:", reponse.status_code)
@@ -145,6 +147,16 @@ def get_map_api(id_map: int = -1):
     
     return None
 
+
+if __name__ == "__main__":
+    # Test de la création de la carte
+    objet_map = creer_map()
+    if objet_map is None:
+        print("Erreur lors de la récupération de la carte")
+        exit()
+    print("Carte récupérée:", objet_map)
+    print("Dimensions de la carte:", objet_map.max_x, objet_map.max_y, objet_map.max_z)
+    
 
 # objet_map = create_map()
 
