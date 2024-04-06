@@ -4,13 +4,11 @@ import requests
 
 
 def get_map():
-    url = "https://odyssey.haum.org/api/game/new/"
+    url = "https://odyssey.haum.org/api/game/new"
     headers = {"Authorization" : "TOKEN 2e214b6a84dfda39d009126bf4fd045a2d3c28f9"}
     
     response = requests.get(url, headers=headers,)
     print(response.status_code)
-    
-    if response.status_code == 200:
-        print(response.json())
+    print(response.json())
 
 get_map()
