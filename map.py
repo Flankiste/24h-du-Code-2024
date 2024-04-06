@@ -135,17 +135,20 @@ Exemple de la classe Map
 # print("Case 0, 0, 0 solide ? :", map_test.estSolide(0, 0, 0))
 
 # Création de la carte (récupère la carte sur le serveur et renvoie un objet de la classe Map)
-def creer_map(id_map: int = -1) -> Map|None:
-    donnees_map_string = get_map_api(id_map)
+def creer_map(id_map: int = -1, stage="") -> Map|None:
+    donnees_map_string = get_map_api(id_map, stage=stage)
     if donnees_map_string is None:
         return None
     return Map(donnees_map_string["map_data"], donnees_map_string["game_id"])
     
 # Récupération de la carte sur le serveur, renvoie un string contenant le string de la carte (dimensions + cases + spawn)
-def get_map_api(id_map: int = -1):
+def get_map_api(id_map: int = -1, stage=""):
     url = "https://odyssey.haum.org/api/game/new"
-    if id_map >= 0:
-        url += "/" + str(id_map)
+    if stage != "":
+        url += "/" + stage
+        print("STAGE EN COURS !!!!")
+    # if id_map >= 0:
+    #     url += "/" + str(id_map)
     
     headers = {"Authorization" : f"TOKEN {config["TokenServer"]}"}
     
@@ -155,18 +158,24 @@ def get_map_api(id_map: int = -1):
     if reponse.status_code == 200:
         # print(reponse.json())
         return reponse.json()
+    else:
+        print("Erreur lors de la récupération de la carte", reponse.status_code, reponse.text)
+        raise ValueError("Erreur lors de la récupération de la carte", reponse.status_code, reponse.text)
     
-    return None
+    # return None
 
 
-if __name__ == "__main__":
-    # Test de la création de la carte
-    objet_map = creer_map()
-    if objet_map is None:
-        print("Erreur lors de la récupération de la carte")
-        exit()
-    print("Carte récupérée:", objet_map)
-    print("Dimensions de la carte:", objet_map.max_x, objet_map.max_y, objet_map.max_z)
+"""
+Sert uniquement pour les tests
+"""
+# if __name__ == "__main__":
+#     # Test de la création de la carte
+#     objet_map = creer_map()
+#     if objet_map is None:
+#         print("Erreur lors de la récupération de la carte")
+#         exit()
+#     print("Carte récupérée:", objet_map)
+#     print("Dimensions de la carte:", objet_map.max_x, objet_map.max_y, objet_map.max_z)
     
 
 # objet_map = create_map()

@@ -10,7 +10,7 @@ def calcul_vitesse_chemin(liste): # détermine une liste de vitesses en fonction
                 deplacement[j] = 0  # pas de déplacement
         deplacements.append(deplacement) #ajoute le déplacement à la liste des déplacements
     deplacements.insert(0, [0, 0, 0])  # Vitesse initiale
-    deplacements.append([0, 0, 0])  # Vitesse finale
+    # deplacements.append([0, 0, 0])  # Vitesse finale
     return deplacements
 
 def calcul_acceleration_chemin(vitesses: list[tuple[int, int, int]]): # détermine une liste d'accélérations en fonction des vitesses
@@ -23,12 +23,11 @@ def calcul_acceleration_chemin(vitesses: list[tuple[int, int, int]]): # détermi
         
 
 # Test de la fonction avec chemin_test
-chemin_test = [[0, 0, 0], [1, 0, 0], [2, 0, 0], [2, 1, 0], [2, 2, 0], [2, 2, 1], [2, 2, 2]]
+# if __name__ == "__main__":
+# 	chemin_test = [[0, 0, 0], [1, 0, 0], [2, 0, 0], [2, 1, 0], [2, 2, 0], [2, 2, 1], [2, 2, 2]]
 
-vitesses = calcul_vitesse_chemin(chemin_test)
-print("Vitesses:", vitesses)
+# 	vitesses = calcul_vitesse_chemin(chemin_test)
+# 	print("Vitesses:", vitesses)
 
-accelerations = calcul_acceleration_chemin(vitesses)
-print("Accélérations:", accelerations)
-
-# print("Mouvements nécessaires :", resultat)
+# 	accelerations = calcul_acceleration_chemin(vitesses)
+# 	print("Accélérations:", accelerations)
