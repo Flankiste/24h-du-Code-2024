@@ -62,13 +62,14 @@ class Map:
         __init__(self, map_string: str): Initialise une nouvelle instance de la classe Map.
     """
     
-    def __init__(self, map_string: str):
+    def __init__(self, map_string: str, game_id: int):
         """
         Le constructeur de la classe Map.
 
         Paramètres:
             map_string (str): La map en string récupérée sur le serveur.
         """
+        self.game_id = game_id
         # Convertion en liste pour pouvoir itérer sur les lignes
         map_lignes = map_string.split("\n")
         map_lignes = list(filter(lambda line: line.strip(), map_lignes)) # Supprime les lignes vides
@@ -120,7 +121,11 @@ class Map:
         Retour:
             bool: True si la case est solide, False sinon.
         """
-        return not (self.map[x, y, z] == ESPACE or self.map[x, y, z] == DESTINATION)
+        self.map[x, y, z]
+        if self.map[x, y, z] == ESPACE or self.map[x, y, z] == DESTINATION:
+            return False
+        else:
+            return True
 
 """
 Exemple de la classe Map
@@ -134,7 +139,7 @@ def creer_map(id_map: int = -1) -> Map|None:
     donnees_map_string = get_map_api(id_map)
     if donnees_map_string is None:
         return None
-    return Map(donnees_map_string["map_data"])
+    return Map(donnees_map_string["map_data"], donnees_map_string["game_id"])
     
 # Récupération de la carte sur le serveur, renvoie un string contenant le string de la carte (dimensions + cases + spawn)
 def get_map_api(id_map: int = -1):
