@@ -3,13 +3,48 @@ import json
 from map import Map
 
 config = json.load(open("config.json"))
+liste_resultats = []
+
+# Vers le serveur
+
+def get_score():
+    url = "https://odyssey.haum.org/api/score"
+    headers = {"Authorization" : "TOKEN 2e214b6a84dfda39d009126bf4fd045a2d3c28f9"}
+    
+    response = requests.get(url, headers=headers,)
+    print(response.status_code)
+    print(response.json())
+    return response.json()
+
+def send_correction(game_id : int, score : float):
+    # Envoi de la correction vers le serveur
+    url = f"https://odyssey.haum.org/api/score"
+    headers = {"Authorization": f"TOKEN {config['TokenServer']}"}
+    data = {"game_id": game_id, "score": score}
+    
+    response = requests.post(url, headers=headers, data=data)
+    print(response.json())
+    
+def send_solutions(game_id : int, solution : list):
+    # Envoi de la solution vers le serveur
+    url = f"https://odyssey.haum.org/api/game/{game_id}/solve"
+    headers = {"Authorization": f"TOKEN {config['TokenServer']}"}
+    
+    # Sauvegarde de la solution dans un fichier texte
+    with open(f"solution_{game_id}.txt", "a") as file:
+        for move in solution:
+            file.write(f"ACC {move[0]} {move[1]} {move[2]}\n")
+    
+    data = {"moves": open(f"solution_{game_id}.txt", "r").read()}
+    
+    response = requests.post(url, headers=headers, data=data)
+    print(response.json())
 
 def verify_solution(map : Map, solution : list):
     grid = map.map
     moves = solution
     
-    # Vérification de la solution
-            
+    # Vérification de la solution           
     velocity = [0, 0, 0]
     position = map.spawn
     previous_position = position
@@ -32,30 +67,28 @@ def verify_solution(map : Map, solution : list):
     
     if grid[interpolated_position[0], interpolated_position[1], interpolated_position[2]] == 1:
         return True
+    
+def move_number(map : Map, solution : list):    
+    with open(f"{game_id}.txt", "a") as file :
+        lignes = rep["moves"].split('\n')
+        for ligne in lignes : 
+            file.write(ligne + '\n')
 
-def send_solutions(game_id : int, solution : list):
-    # Envoi de la solution vers le serveur
-    url = f"https://odyssey.haum.org/api/game/{game_id}/solve"
-    headers = {"Authorization": f"TOKEN {config['TokenServer']}"}
-    
-    # Sauvegarde de la solution dans un fichier texte
-    with open(f"solution_{game_id}.txt", "a") as file:
-        for move in solution:
-            file.write(f"ACC {move[0]} {move[1]} {move[2]}\n")
-    
-    data = {"moves": open(f"solution_{game_id}.txt", "r").read()}
-    
-    response = requests.post(url, headers=headers, data=data)
-    print(response.json())
-    
-def send_correction(game_id : int, score : float):
-    # Envoi de la correction vers le serveur
-    url = f"https://odyssey.haum.org/api/score"
-    headers = {"Authorization": f"TOKEN {config['TokenServer']}"}
-    data = {"game_id": game_id, "score": score}
-    
-    response = requests.post(url, headers=headers, data=data)
-    print(response.json())
+
+    with open("34.txt", "r") as file:
+        for ligne in file :
+            l = ligne.split(" ")
+
+            l.remove ("ACC")
+
+            for i in range(len(l)):
+                l[i]=abs(int(l[i]))
+            if sum(l) != 0:
+                count +=1
+
+            print (l)
+        print(count)
+
 def score(nombre_coups):
     # Tri de la liste des coups effectués par ordre croissant
     nombre_coups.sort()
@@ -79,3 +112,16 @@ def score(nombre_coups):
 nombre_coups = [6, 2, 3, 8, 9]
 points_joueurs = score(nombre_coups)
 print("Points des joueurs : ", points_joueurs)
+
+rep = get_score():
+
+soluce = {
+    "game_id": rep["game_id"],
+    "moves": rep["moves"],
+    "map_data" : Map(rep["map_data"]),
+    "nb_moves": int
+}
+
+verify_solution(soluce["map_data"], soluce["moves"])
+
+

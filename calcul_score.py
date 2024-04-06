@@ -13,7 +13,7 @@ def get_score():
     return response.json()
 
 rep = get_score()
-with open(f"{34}.txt", "a") as file :
+with open(f"{game_id}.txt", "a") as file :
     lignes = rep["moves"].split('\n')
     for ligne in lignes : 
         file.write(ligne + '\n')

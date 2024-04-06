@@ -122,3 +122,6 @@ class MapCreation:
         print(response.json())
         return response
 
+gen = MapCreation()
+gen.generate()
+gen.save()
