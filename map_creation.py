@@ -4,6 +4,7 @@ import requests
 import json
 from collections import defaultdict
 max_size = 5
+max_size = 5
 
 config = json.load(open("config.json"))
 
@@ -12,6 +13,8 @@ class MapCreation:
         self.seed = seed
         self.limit = 25
         random.seed(seed)
+        base_size = random.randint(3, max_size)
+        variation = max_size - base_size
         base_size = random.randint(3, max_size)
         variation = max_size - base_size
         self.dimensions = (
@@ -119,17 +122,19 @@ class MapCreation:
         with open(f"maps_txt/map_{seed}.txt", "r") as file:
             map = file.read()
             return map
+        
+    def load(self, seed):
+        with open(f"maps_txt/map_{seed}.txt", "r") as file:
+            map = file.read()
+            return map
     
     def post(self):
         url = "https://odyssey.haum.org/api/map/new/2e214b6a84"
+        url = "https://odyssey.haum.org/api/map/new/2e214b6a84"
         headers = {"Authorization": f"TOKEN {config["TokenServer"]}"}
+        data = {"map" : self.load(self.seed)}
         data = {"map" : self.load(self.seed)}
         
         response = requests.post(url, headers=headers, data=data)
         print(response.json())
         return response
-
-gen = MapCreation(max_size=7)
-gen.generate()
-gen.save()
-gen.post()
