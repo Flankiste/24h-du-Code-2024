@@ -1,33 +1,25 @@
-def calcul_vitesse_chemin(liste): # détermine une liste de vitesses en fonction des points formant le chemin
-    deplacements = []
-    for i in range(len(liste) - 1): # pour i parcourant la liste des points
-        deplacement = [0, 0, 0]
-        for j in range(3):  # x, y, z
-            diff = liste[i+1][j] - liste[i][j]
-            if diff == 1: # mouvement pour égaliser les positions
-                deplacement[j] = 1  # ajouter 1 à la coordonnée
-            elif diff == 0: # mouvement null
-                deplacement[j] = 0  # pas de déplacement
-        deplacements.append(deplacement) #ajoute le déplacement à la liste des déplacements
-    deplacements.insert(0, [0, 0, 0])  # Vitesse initiale
-    # deplacements.append([0, 0, 0])  # Vitesse finale
-    return deplacements
-
-def calcul_acceleration_chemin(vitesses: list[tuple[int, int, int]]): # détermine une liste d'accélérations en fonction des vitesses
-    accelerations = []
-    for i in range(0, len(vitesses) - 1): # pour i parcourant la liste des vitesses
-        vitesse_precedente = vitesses[i]
-        vitesse_suivante = vitesses[i + 1]
-        accelerations.append([vitesse_suivante[j] - vitesse_precedente[j] for j in range(3)]) # ajoute la différence des vitesses à la liste des accélérations
-    return accelerations
+class Joueur:
+    def __init__(self, path) -> None:
+        self.path : list[tuple[int, int, int]] = path
+        self.deplacements : list[tuple[int, int, int]] = []
+        self.acceleration : list[tuple[int, int, int]]
         
-
-# Test de la fonction avec chemin_test
-# if __name__ == "__main__":
-# 	chemin_test = [[0, 0, 0], [1, 0, 0], [2, 0, 0], [2, 1, 0], [2, 2, 0], [2, 2, 1], [2, 2, 2]]
-
-# 	vitesses = calcul_vitesse_chemin(chemin_test)
-# 	print("Vitesses:", vitesses)
-
-# 	accelerations = calcul_acceleration_chemin(vitesses)
-# 	print("Accélérations:", accelerations)
+    def mouvements(self) -> list: # détermine une liste de  déplacements en fonction des coordonnées
+        mouvements = []
+        for i in range(len(self.path) - 1): # pour i parcourant la liste des positions
+            mouvement = [self.path[i + 1][j] - self.path[i][j] for j in range(3)] # ajoute la différence des positions à la liste des déplacements
+            mouvements.append(mouvement)
+        self.deplacements = mouvements
+        return mouvements
+    
+    def accelerations(self) -> list:
+        if not self.deplacements:
+            self.mouvements()
+        accelerations = []
+        initial_speed = [0, 0, 0]
+        first_acceleration = [self.deplacements[0][j] - initial_speed[j] for j in range(3)]
+        accelerations.append(first_acceleration)
+        for i in range(1, len(self.deplacements)):
+            acceleration = [self.deplacements[i][j] - self.deplacements[i-1][j] for j in range(3)]
+            accelerations.append(acceleration)
+        return accelerations
