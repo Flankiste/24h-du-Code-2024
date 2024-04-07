@@ -67,16 +67,17 @@ def verify_solution(map : Map, solution : list):
     
     if grid[interpolated_position[0], interpolated_position[1], interpolated_position[2]] == 1:
         return True
-    
+
+# Récupère le mouv en chaine de charachtère et somme tout les veteurs en valeur abs
 def move_number(map : Map, solution : list):    
     with open(f"{game_id}.txt", "a") as file :
+
         lignes = rep["moves"].split('\n')
+        
         for ligne in lignes : 
+
             file.write(ligne + '\n')
 
-
-    with open("34.txt", "r") as file:
-        for ligne in file :
             l = ligne.split(" ")
 
             l.remove ("ACC")
@@ -89,24 +90,6 @@ def move_number(map : Map, solution : list):
             print (l)
         print(count)
 
-def score(nombre_coups):
-    # Tri de la liste des coups effectués par ordre croissant
-    nombre_coups.sort()
-    
-    min_coups = nombre_coups[0]
-    max_coups = nombre_coups[-1]
-    
-    # Calcul des points par joueur 
-    points_joueurs = {}
-    for coups in nombre_coups:
-        if coups == min_coups:
-            points_joueurs[coups] = 0
-        elif coups == max_coups:
-            points_joueurs[coups] = 5 + 2 * max_coups # A modifier 
-        else: 
-            points_joueurs[coups] = (coups - min_coups)
-            
-    return points_joueurs
 
 # Exemple
 nombre_coups = [6, 2, 3, 8, 9]
