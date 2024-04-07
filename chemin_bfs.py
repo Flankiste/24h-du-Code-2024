@@ -45,6 +45,9 @@ def chemin_bfs(objet_map: Map) -> list[tuple[int, int, int]]:
     chemin_complet = []
     pos_actuelle = objet_map.spawn
     for index_objectif, objectif in enumerate(objectifs):  # Pour chaque objectif
+        if index_objectif > nb_checkpoints:
+            break
+        
         # Parcours en largeur
         print("Objectif:", objectif)
         pos_depart = pos_actuelle
