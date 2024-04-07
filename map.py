@@ -122,10 +122,10 @@ class Map:
             bool: True si la case est solide, False sinon.
         """
         self.map[x, y, z]
-        if self.map[x, y, z] == ESPACE or self.map[x, y, z] == DESTINATION:
-            return False
+        if self.map[x, y, z] == ASTEROIDE or self.map[x, y, z] == NEBULEUSE or self.map[x, y, z] == NUAGES_MAGNETIQUES:
+            return True  # La case est solide
         else:
-            return True
+            return False  # La case est vide
 
 """
 Exemple de la classe Map
