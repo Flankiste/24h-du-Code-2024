@@ -150,7 +150,7 @@ def get_map_api(id_map: int = -1, stage=""):
     # if id_map >= 0:
     #     url += "/" + str(id_map)
     
-    headers = {"Authorization" : f"TOKEN {config["TokenServer"]}"}
+    headers = {"Authorization" : "TOKEN " + config["TokenServer"]}
     
     reponse = requests.get(url, headers=headers)
     print("Récupération de la carte:", reponse.status_code)

@@ -15,6 +15,7 @@ from mouvements import calcul_vitesse_chemin, calcul_acceleration_chemin
 # from map import ESPACE, DESTINATION, ASTEROIDE, NEBULEUSE, NUAGES_MAGNETIQUES, CHECKPOINT_1, CHECKPOINT_2, CHECKPOINT_3, CHECKPOINT_4, SPAWN
 
 config = json.load(open("config.json"))
+print(config)
 
 
 VOISINS_COTES = [
@@ -122,7 +123,7 @@ def envoi_accelerations(accelerations: list[list[int]], id_partie):
     """
     url = 'https://odyssey.haum.org/api/game/' + str(id_partie) + '/solve'
     
-    headers = {"Authorization" : f"TOKEN {config["TokenServer"]}"}
+    headers = {"Authorization" : "TOKEN " + config["TokenServer"]}
     
     accelerations_string = ""
     for i in range(len(accelerations)):
