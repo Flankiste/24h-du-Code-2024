@@ -38,13 +38,14 @@ def chemin_bfs(objet_map: Map) -> list[tuple[int, int, int]]:
     print("Destinations:", objet_map.destinations)
     
     # Crée une liste de cases à visiter
+    nb_checkpoints = len(objet_map.checkpoints)
     objectifs = list([tuple(objet_map.checkpoints[i]) for i in range(len(objet_map.checkpoints))])
     # Ajoute aléatoirement une destination finale
-    objectifs.append(tuple(random.choice(objet_map.destinations)))  # TODO: Trouver un meilleur moyen de choisir la destination
+    objectifs.extend(objet_map.destinations)  # TODO: Trouver un meilleur moyen de choisir la destination
     
     chemin_complet = []
     pos_actuelle = objet_map.spawn
-    for objectif in objectifs:  # Pour chaque objectif
+    for index_objectif, objectif in enumerate(objectifs):  # Pour chaque objectif
         # Parcours en largeur
         print("Objectif:", objectif)
         pos_depart = pos_actuelle
@@ -58,6 +59,8 @@ def chemin_bfs(objet_map: Map) -> list[tuple[int, int, int]]:
         
         # Tant qu'il reste des cases à visiter
         while len(a_visiter) > 0:
+            if objectif_atteint:
+                break
             # Récupère la case actuelle
             case = a_visiter.pop(0)
             x, y, z = case
@@ -65,7 +68,7 @@ def chemin_bfs(objet_map: Map) -> list[tuple[int, int, int]]:
             visites.append(case)
             
             # Si la case est un objectif
-            if case == objectif:
+            if (index_objectif < nb_checkpoints and case == objectif) or (index_objectif >= nb_checkpoints and case in objectifs[nb_checkpoints:]):
                 print("Objectif atteint")
                 objectif_atteint = True
                 break
@@ -74,20 +77,22 @@ def chemin_bfs(objet_map: Map) -> list[tuple[int, int, int]]:
             for voisin_x, voisin_y, voisin_z in VOISINS_COTES:
                 # Calcule la nouvelle position
                 nv_x, nv_y, nv_z = x + voisin_x, y + voisin_y, z + voisin_z
+                nv_case = (nv_x, nv_y, nv_z)
                 
                 # Si la nouvelle position est dans les limites de la carte
                 if 0 <= nv_x < objet_map.max_x and 0 <= nv_y < objet_map.max_y and 0 <= nv_z < objet_map.max_z:
-                    if (nv_x, nv_y, nv_z) in visites or (nv_x, nv_y, nv_z) in a_visiter:
+                    if nv_case in visites or nv_case in a_visiter:
                         continue # Case déjà visitée, on passe à la suivante
                     
                     if objet_map.estSolide(nv_x, nv_y, nv_z):
                         continue # Case solide, on ne peut pas passer par là
                     
                     # Ajoute la case à visiter
-                    a_visiter.append((nv_x, nv_y, nv_z))
+                    a_visiter.append(nv_case)
                     # Ajoute le déplacement
-                    deplacements_objectif[(nv_x, nv_y, nv_z)] = case
-                    if (nv_x, nv_y, nv_z) == objectif:
+                    deplacements_objectif[nv_case] = case
+                    if (index_objectif < nb_checkpoints and case == objectif) or (index_objectif >= nb_checkpoints and case in objectifs[nb_checkpoints:]):
+                        print("Objectif atteint")
                         objectif_atteint = True
                         break
         
@@ -95,6 +100,9 @@ def chemin_bfs(objet_map: Map) -> list[tuple[int, int, int]]:
             print("Objectif non atteint, id:", objet_map.game_id, "objectif:", objectif, "depart:", pos_depart)
             # print("deplacements_objectif:", deplacements_objectif)
             raise ValueError(f"L'objectif n'a pas été atteint, id: {objet_map.game_id}, objectif: {objectif}, depart: {pos_depart}")
+        
+        if objectif_atteint and index_objectif >= nb_checkpoints:
+            objectif = case
         
         # Récupère le chemin
         chemin_objectif = [tuple(objectif)]
@@ -158,7 +166,7 @@ if __name__ == "__main__":
     else:
         objet_map = creer_map(stage=stage)
     
-    print(f"Map chargée ({objet_map.max_x}x{objet_map.max_y}x{objet_map.max_z})")
+    print(f"Map chargée id={objet_map.game_id} ({objet_map.max_x}x{objet_map.max_y}x{objet_map.max_z})")
     chemin = chemin_bfs(objet_map)
     
     print("Exécution de chemin_bf terminée:")

@@ -3,21 +3,23 @@ import numpy as np
 import requests
 import json
 from collections import defaultdict
+max_size = 5
 
 config = json.load(open("config.json"))
 
 class MapCreation:
-    def __init__(self, seed = random.randint(0, 1000000)):
+    def __init__(self, seed = random.randint(0, 1000000), max_size=max_size):
         self.seed = seed
         self.limit = 25
         random.seed(seed)
-        base_size = random.randint(3, 25)
-        variation = 25 - base_size
+        base_size = random.randint(3, max_size)
+        variation = max_size - base_size
         self.dimensions = (
             base_size + int(random.random()*variation), 
             base_size + int(random.random()*variation), 
             base_size + int(random.random()*variation)
         )
+        print(f"Dimensions: {self.dimensions}")
         self.N =  self.dimensions[0]*self.dimensions[1]*self.dimensions[2]
         self.start : int
         self.grid = [[['AAA' for _ in range(self.dimensions[2])] for _ in range(self.dimensions[1])] for _ in range(self.dimensions[0])]
@@ -112,16 +114,22 @@ class MapCreation:
         
         with open(f"maps_txt/map_{self.seed}.txt", "r") as file:
             return file.read()
+        
+    def load(self, seed):
+        with open(f"maps_txt/map_{seed}.txt", "r") as file:
+            map = file.read()
+            return map
     
     def post(self):
-        url = "https://odyssey.haum.org/api/map/new"
+        url = "https://odyssey.haum.org/api/map/new/2e214b6a84"
         headers = {"Authorization": f"TOKEN {config["TokenServer"]}"}
-        data = {"map" : self.save()}
+        data = {"map" : self.load(self.seed)}
         
         response = requests.post(url, headers=headers, data=data)
         print(response.json())
         return response
 
-test_mapcreation = MapCreation()
-test_mapcreation.generate()
-test_mapcreation.post()
+gen = MapCreation(max_size=7)
+gen.generate()
+gen.save()
+gen.post()
