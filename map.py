@@ -25,10 +25,10 @@ SPAWN = 9
 # Dictionnaire [id_checkpoint] -> n° checkpoint (0, 1, 2, 3)
 ID_TO_CHECKPOINTS = {
     CHECKPOINT_1: 0,
-     CHECKPOINT_2: 1,
-     CHECKPOINT_3: 2,
-     CHECKPOINT_4: 3
- }
+    CHECKPOINT_2: 1,
+    CHECKPOINT_3: 2,
+    CHECKPOINT_4: 3
+}
 
 STRING_ESPACE = "A"
 CODE_CASE_STRING_INT = {
@@ -62,15 +62,17 @@ class Map:
         __init__(self, map_string: str): Initialise une nouvelle instance de la classe Map.
     """
     
-    def __init__(self, map_string: str):
+    def __init__(self, map_string: str, game_id: int):
         """
         Le constructeur de la classe Map.
 
         Paramètres:
             map_string (str): La map en string récupérée sur le serveur.
         """
+        self.game_id = game_id
         # Convertion en liste pour pouvoir itérer sur les lignes
         map_lignes = map_string.split("\n")
+        map_lignes = list(filter(lambda line: line.strip(), map_lignes)) # Supprime les lignes vides
         
         # Récupération des dimensions de la carte
         ligne_liste = map_lignes[0].split(" ")
@@ -81,12 +83,13 @@ class Map:
         # Récupération des cases de la carte
         self.map = np.zeros((self.max_x, self.max_y, self.max_z), dtype=int)
         self.checkpoints = {}
+        self.destinations = []
         
         # Pour chaque bloc de texte (tranche de coordonnée z)
         for z in range(self.max_z):
             for y in range(self.max_y):
                 # On récupère la ligne en (y, z) contenant les x
-                ligne_liste = map_lignes[1 + z * (self.max_y + 1) + y].split(" ")
+                ligne_liste = map_lignes[1 + z * (self.max_y) + y].split(" ")
                 for x in range(self.max_x):
                     case_string = ligne_liste[x]
                     
@@ -99,10 +102,12 @@ class Map:
                     else:
                         case_int = CODE_CASE_STRING_INT[case_string[0]]
                         self.map[x, y, z] = case_int
-                        self.checkpoints[ID_TO_CHECKPOINTS[case_int]] = (x, y, z)
+                        if case_int in ID_TO_CHECKPOINTS:
+                            self.checkpoints[ID_TO_CHECKPOINTS[case_int]] = (x, y, z)
+                    
                     
         # Récupération des coordonnées du spawn (dernière ligne: START x y z)
-        self.spawn = list(map(int, map_lignes[1 + self.max_z  * (self.max_y + 1)].split(" ")[1:]))
+        self.spawn = list(map(int, map_lignes[2 + self.max_z  * (self.max_y)].split(" ")[1:]))
 
     def estSolide(self, x: int, y: int, z: int) -> bool:
         """
@@ -134,7 +139,7 @@ def creer_map(id_map: int = -1) -> Map|None:
     donnees_map_string = get_map_api(id_map)
     if donnees_map_string is None:
         return None
-    return Map(donnees_map_string["map_data"])
+    return Map(donnees_map_string["map_data"], donnees_map_string["game_id"])
     
 # Récupération de la carte sur le serveur, renvoie un string contenant le string de la carte (dimensions + cases + spawn)
 def get_map_api(id_map: int = -1):
