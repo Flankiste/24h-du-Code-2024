@@ -6,6 +6,7 @@ import json
 import requests
 import tqdm
 from mouvements import Joueur
+from time import time
 
 # Importe la classe Map et la fonction creer_map
 from map import Map, creer_map
@@ -33,14 +34,14 @@ def chemin_bfs(objet_map: Map) -> list[tuple[int, int, int]]:
     
     # objectif = objet_map.destinations[0]
     print("chemin_bfs: Début de la recherche du chemin...")
-    print("Checkpoints:", objet_map.checkpoints)
-    print("Destinations:", objet_map.destinations)
+    # print("Checkpoints:", objet_map.checkpoints)
+    # print("Destinations:", objet_map.destinations)
     
     # Crée une liste de cases à visiter
     nb_checkpoints = len(objet_map.checkpoints)
     objectifs = list([tuple(objet_map.checkpoints[i]) for i in range(len(objet_map.checkpoints))])
     # Ajoute aléatoirement une destination finale
-    objectifs.extend(objet_map.destinations)  # TODO: Trouver un meilleur moyen de choisir la destination
+    objectifs.extend(objet_map.destinations)
     
     chemin_complet = []
     pos_actuelle = objet_map.spawn
@@ -49,7 +50,7 @@ def chemin_bfs(objet_map: Map) -> list[tuple[int, int, int]]:
             break
         
         # Parcours en largeur
-        print("Objectif:", objectif)
+        # print("Objectif:", objectif)
         pos_depart = pos_actuelle
         # Crée une liste de cases visitées
         visites: list[tuple[int, int, int]] = []
@@ -71,7 +72,7 @@ def chemin_bfs(objet_map: Map) -> list[tuple[int, int, int]]:
             
             # Si la case est un objectif
             if (index_objectif < nb_checkpoints and case == objectif) or (index_objectif >= nb_checkpoints and case in objectifs[nb_checkpoints:]):
-                print("Objectif atteint")
+                # print("Objectif atteint")
                 objectif_atteint = True
                 break
             
@@ -118,8 +119,8 @@ def chemin_bfs(objet_map: Map) -> list[tuple[int, int, int]]:
             chemin_objectif.append(tuple(pos_actuelle))
         
         chemin_objectif.reverse()
-        print(f"Chemin bfs trouvé! Longueur: {len(chemin_objectif)}, Depart: {pos_depart}, Objectif: {objectif}")
-        print(f"{chemin_objectif}")
+        # print(f"Chemin bfs trouvé! Longueur: {len(chemin_objectif)}, Depart: {pos_depart}, Objectif: {objectif}")
+        # print(f"{chemin_objectif}")
         pos_actuelle = objectif
         chemin_complet.extend(chemin_objectif)
     return chemin_complet
@@ -142,7 +143,7 @@ def envoi_accelerations(accelerations: list[list[int]], id_partie):
             accelerations_string += "\n"
     
     print("Envoi des accélérations au serveur:")
-    print(accelerations_string)
+    # print(accelerations_string)
     
     reponse = requests.post(url, headers=headers, data={"moves": accelerations_string})
     
@@ -158,28 +159,46 @@ Récupère une map (stage optionnel), la résoud puis envoie les accélérations
 """
 if __name__ == "__main__":
     test = False
-    # stage = "alpha"
-    stage = config["TokenServer"][:10]
+    stage = "training"
+    # stage = "gamma"
+    # stage = config["TokenServer"][:10]
     
-    # objet_map, chemin = test_chemin_bfs(test=False)
-    objet_map: Map = None
-    if test:
-        objet_map = Map("MAP 10 2 11\nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \n\nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \n\nA// AAA AAA AAA AAA AAA AAA AAA AAA AAA \nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \n\nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \n\nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \n\nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \n\nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \n\nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \n\nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \n\nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \n\nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \nENDMAP\nSTART 0 0 0\n", -1)
-    else:
-        objet_map = creer_map(stage=stage)
+    nb_maps = 1
     
-    print(f"Map chargée id={objet_map.game_id} ({objet_map.max_x}x{objet_map.max_y}x{objet_map.max_z})")
-    chemin = chemin_bfs(objet_map)
-    
-    print("Exécution de chemin_bf terminée:")
-    print(*chemin)
-    
-    joueur = Joueur(chemin)
-    
-    accelerations = joueur.accelerations()
-    print("Accélérations:", accelerations)
-    print("Fin du test de chemin_bfs")
-    
-    if not test:
-        envoi_accelerations(accelerations, objet_map.game_id)
+    # Boucle pour tester toutes les maps d'un stage
+    while nb_maps <= 1 or (stage != "" and nb_maps <= 10):
+        temps_debut = time()
+        while time() - temps_debut < 0.8:
+            ...
+        
+        print(f"MAP n°{nb_maps}")
+        
+        objet_map: Map = None
+        try:
+            if test:
+                objet_map = Map("MAP 10 2 11\nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \n\nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \n\nA// AAA AAA AAA AAA AAA AAA AAA AAA AAA \nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \n\nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \n\nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \n\nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \n\nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \n\nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \n\nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \n\nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \n\nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \nAAA AAA AAA AAA AAA AAA AAA AAA AAA AAA \nENDMAP\nSTART 0 0 0\n", -1)
+            else:
+                objet_map = creer_map(stage=stage)
+        except Exception as e:
+            print("Erreur lors de la récupération de la map")
+            print(e)
+            break
+        
+        print(f"Map chargée id={objet_map.game_id} ({objet_map.max_x}x{objet_map.max_y}x{objet_map.max_z})")
+        chemin = chemin_bfs(objet_map)
+        
+        # print("Exécution de chemin_bf terminée:")
+        # print(*chemin)
+        
+        joueur = Joueur(chemin)
+        
+        accelerations = joueur.accelerations()
+        # print("Accélérations:", accelerations)
+        # print("Fin du test de chemin_bfs")
+        
+        if not test:
+            envoi_accelerations(accelerations, objet_map.game_id)
+        
+        nb_maps += 1
+        
     
