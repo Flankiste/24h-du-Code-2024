@@ -138,3 +138,8 @@ class MapCreation:
         response = requests.post(url, headers=headers, data=data)
         print(response.json())
         return response
+
+gen = MapCreation()
+gen.generate()
+gen.save()
+gen.post()

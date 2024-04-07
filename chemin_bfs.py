@@ -5,11 +5,10 @@ import random
 import json
 import requests
 import tqdm
+from mouvements import Joueur
 
 # Importe la classe Map et la fonction creer_map
 from map import Map, creer_map
-
-from mouvements import calcul_vitesse_chemin, calcul_acceleration_chemin
 
 # Importe les différents types de cases
 # from map import ESPACE, DESTINATION, ASTEROIDE, NEBULEUSE, NUAGES_MAGNETIQUES, CHECKPOINT_1, CHECKPOINT_2, CHECKPOINT_3, CHECKPOINT_4, SPAWN
@@ -172,10 +171,9 @@ if __name__ == "__main__":
     print("Exécution de chemin_bf terminée:")
     print(*chemin)
     
-    vitesses = calcul_vitesse_chemin(chemin)
-    print("Vitesses:", vitesses)
+    joueur = Joueur(chemin)
     
-    accelerations = calcul_acceleration_chemin(vitesses)
+    accelerations = joueur.accelerations()
     print("Accélérations:", accelerations)
     print("Fin du test de chemin_bfs")
     

@@ -1,0 +1,14 @@
+MAP 3 3 3
+AAA F// A//
+E// AAA AAA
+D// AAA D//
+
+C// AAA B//
+B// A// AAA
+AAA D// AAA
+
+B// D// AAA
+AAA B// C//
+B// AAA AAA
+ENDMAP
+START 2 0 0
