@@ -64,6 +64,42 @@ def move_number(map : Map, moves : list, soluce : dict):
 def score(rep):
     
     soluce = {
+    previous_position = position
+    
+    if grid[interpolated_position[0], interpolated_position[1], interpolated_position[2]] == 1:
+        return True
+
+# Récupère le mouv en chaine de charachtère et somme tout les veteurs en valeur abs
+def move_number(map : Map, solution : list):    
+    with open(f"{game_id}.txt", "a") as file :
+
+        lignes = rep["moves"].split('\n')
+        
+        for ligne in lignes : 
+
+            file.write(ligne + '\n')
+
+            l = ligne.split(" ")
+
+            l.remove ("ACC")
+
+            for i in range(len(l)):
+                l[i]=abs(int(l[i]))
+            if sum(l) != 0:
+                count +=1
+
+            print (l)
+        print(count)
+
+
+# Exemple
+nombre_coups = [6, 2, 3, 8, 9]
+points_joueurs = score(nombre_coups)
+print("Points des joueurs : ", points_joueurs)
+
+rep = get_score():
+
+soluce = {
     "game_id": rep["game_id"],
     "moves": rep["moves"].split('\n'),
     "map_data" : Map(rep["map_data"], rep["game_id"]),
