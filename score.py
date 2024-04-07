@@ -84,7 +84,7 @@ def score(rep):
     soluce["nb_moves"] = move_number(soluce["map_data"], soluce["moves"], soluce)
     print(f"Nombre de coups : {soluce["nb_moves"]}")
 
-
+score(get_score())
 
 
 
