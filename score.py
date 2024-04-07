@@ -1,33 +1,28 @@
 import requests
 import json
 from map import Map
+import math
 
 config = json.load(open("config.json"))
 liste_resultats = []
 
 # Vers le serveur
-
 def get_score():
-    url = "https://odyssey.haum.org/api/score"
+    url = "https://odyssey.haum.org/api/score/2e214b6a84"
     headers = {"Authorization" : "TOKEN 2e214b6a84dfda39d009126bf4fd045a2d3c28f9"}
     
     response = requests.get(url, headers=headers,)
-    print(response.status_code)
-    
-    if response.status_code == 200:
-        return response.json()
-    else:
-        return None
+    return response
 
 def send_correction(game_id : int, score : float):
     # Envoi de la correction vers le serveur
-    url = f"https://odyssey.haum.org/api/score/alpha"
+    url = f"https://odyssey.haum.org/api/score/2e214b6a84"
     headers = {"Authorization": f"TOKEN {config['TokenServer']}"}
     data = {"game_id": game_id, "score": score}
     
     response = requests.post(url, headers=headers, data=data)
     print(response.json())
-    
+
 def verify_solution(map : Map, solution : list):
     grid = map.map
     moves = solution
@@ -45,69 +40,42 @@ def verify_solution(map : Map, solution : list):
             interpolated_position_int = [int(round(x)) for x in interpolated_position]
 
             if not (0 <= interpolated_position_int[0] < map.max_x and 0 <= interpolated_position_int[1] < map.max_y and 0 <= interpolated_position_int[2] < map.max_z):
-                return False
+                print("Out of bounds")
+                delta = [interpolated_position[i] - previous_position[i] for i in range(3)]
+                vector = [delta[i] / velocity[i] if velocity[i] != 0 else 0 for i in range(3)]
+                modulus = math.sqrt(sum([vector[i] ** 2 for i in range(len(vector))]))
+                return (False, modulus)# Return the exact coordinates as floats
 
             if grid[interpolated_position_int[0], interpolated_position_int[1], interpolated_position_int[2]] == 2:
-                return interpolated_position  # Return the exact coordinates as floats
+                print("Collision")
+                delta = [interpolated_position[i] - previous_position[i] for i in range(3)]
+                vector = [delta[i] / velocity[i] if velocity[i] != 0 else 0 for i in range(3)]
+                modulus = math.sqrt(sum([vector[i] ** 2 for i in range(len(vector))]))
+                return (False, modulus)# Return the exact coordinates as floats
+            
+            if grid[interpolated_position_int[0], interpolated_position_int[1], interpolated_position_int[2]] == 1:
+                print("Destination reached")
+                delta = [interpolated_position[i] - previous_position[i] for i in range(3)]
+                vector = [delta[i] / velocity[i] if velocity[i] != 0 else 0 for i in range(3)]
+                modulus = math.sqrt(sum([vector[i] ** 2 for i in range(len(vector))]))
+                return (True, modulus)# Return the exact coordinates as floats
+                
 
         previous_position = position
+    print("Destination not reached")
+    return (False, 0)  # Destination not reached
 
-    return False  # Return False if no collision is detected
-    
-def move_number(map : Map, moves : list, soluce : dict):
-    count = 0
-    for move in moves:
-        if sum(abs(x) for x in move) != 0:
-            count += 1
-    return count
 
 def score(rep):
-    
     soluce = {
-    previous_position = position
-    
-    if grid[interpolated_position[0], interpolated_position[1], interpolated_position[2]] == 1:
-        return True
-
-# Récupère le mouv en chaine de charachtère et somme tout les veteurs en valeur abs
-def move_number(map : Map, solution : list):    
-    with open(f"{game_id}.txt", "a") as file :
-
-        lignes = rep["moves"].split('\n')
+        "game_id": rep["game_id"],
+        "moves": rep["moves"].split('\n'),
+        "map_data" : Map(rep["map_data"], rep["game_id"]),
+        "nb_moves": len(rep["moves"].split('\n')),
+        "cleared" : bool,
+        "score": float
+        }
         
-        for ligne in lignes : 
-
-            file.write(ligne + '\n')
-
-            l = ligne.split(" ")
-
-            l.remove ("ACC")
-
-            for i in range(len(l)):
-                l[i]=abs(int(l[i]))
-            if sum(l) != 0:
-                count +=1
-
-            print (l)
-        print(count)
-
-
-# Exemple
-nombre_coups = [6, 2, 3, 8, 9]
-points_joueurs = score(nombre_coups)
-print("Points des joueurs : ", points_joueurs)
-
-rep = get_score():
-
-soluce = {
-    "game_id": rep["game_id"],
-    "moves": rep["moves"].split('\n'),
-    "map_data" : Map(rep["map_data"], rep["game_id"]),
-    "nb_moves": len(rep["moves"].split('\n')),
-    "cleared" : bool,
-    "score": float
-    }
-    
     for i in range(len(soluce["moves"])):
         soluce["moves"][i] = soluce["moves"][i].split(" ")
         
@@ -117,10 +85,30 @@ soluce = {
         
     soluce["cleared"] = verify_solution(soluce["map_data"], soluce["moves"])
     print(f"Map cleared : {soluce["cleared"]}")
-    soluce["nb_moves"] = move_number(soluce["map_data"], soluce["moves"], soluce)
     print(f"Nombre de coups : {soluce["nb_moves"]}")
 
-score(get_score())
+    score = soluce["nb_moves"] + soluce["cleared"][1]
+
+    print(f"Score : {score}")
+    
+    return score
+
+
+if __name__ == "__main__":
+    while True:
+        rep : requests.Response = get_score()
+        if rep.status_code == 500:
+            print(f"{rep.status_code} : Aucun score à récupérer")
+            break
+        if rep.status_code == 200:
+            print(f" {rep.status_code} : Récupération de nouveaux scores")
+            data = rep.json()
+            sc = score(data)
+            send_correction(data["game_id"], sc)
+        else:
+            print(f"Erreur lors de la récupération des scores : {rep.status_code}")
+
+
 
 
 
