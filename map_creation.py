@@ -3,8 +3,7 @@ import numpy as np
 import requests
 import json
 from collections import defaultdict
-max_size = 5
-max_size = 5
+max_size = 25
 
 config = json.load(open("config.json"))
 
@@ -13,8 +12,6 @@ class MapCreation:
         self.seed = seed
         self.limit = 25
         random.seed(seed)
-        base_size = random.randint(3, max_size)
-        variation = max_size - base_size
         base_size = random.randint(3, max_size)
         variation = max_size - base_size
         self.dimensions = (
@@ -58,8 +55,7 @@ class MapCreation:
         # Placement des blocs de type A
         for i in range(quantities["A//"]):
             x, y, z = (random.randint(0, self.dimensions[0]-1), random.randint(0, self.dimensions[1]-1), random.randint(0, self.dimensions[2]-1))
-            self.grid[x][y][z] = 'A//'   
-        
+            self.grid[x][y][z] = 'A//'
         
         # Placements des centres des groupes de blocs
         number_of_groups = random.randint(3, 20)
@@ -122,15 +118,9 @@ class MapCreation:
         with open(f"maps_txt/map_{seed}.txt", "r") as file:
             map = file.read()
             return map
-        
-    def load(self, seed):
-        with open(f"maps_txt/map_{seed}.txt", "r") as file:
-            map = file.read()
-            return map
     
     def post(self):
-        url = "https://odyssey.haum.org/api/map/new/2e214b6a84"
-        url = "https://odyssey.haum.org/api/map/new/2e214b6a84"
+        url = "https://odyssey.haum.org/api/map/new/gamma"
         headers = {"Authorization": f"TOKEN {config["TokenServer"]}"}
         data = {"map" : self.load(self.seed)}
         data = {"map" : self.load(self.seed)}
@@ -139,7 +129,7 @@ class MapCreation:
         print(response.json())
         return response
 
-gen = MapCreation()
-gen.generate()
-gen.save()
-gen.post()
+if __name__ == "__main__":
+    grid = MapCreation(90876)
+    grid.post()
+    

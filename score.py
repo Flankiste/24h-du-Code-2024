@@ -8,7 +8,7 @@ liste_resultats = []
 
 # Vers le serveur
 def get_score():
-    url = "https://odyssey.haum.org/api/score/2e214b6a84"
+    url = "https://odyssey.haum.org/api/score/beta"
     headers = {"Authorization" : "TOKEN 2e214b6a84dfda39d009126bf4fd045a2d3c28f9"}
     
     response = requests.get(url, headers=headers,)
@@ -16,12 +16,12 @@ def get_score():
 
 def send_correction(game_id : int, score : float):
     # Envoi de la correction vers le serveur
-    url = f"https://odyssey.haum.org/api/score/2e214b6a84"
+    url = f"https://odyssey.haum.org/api/score/beta"
     headers = {"Authorization": f"TOKEN {config['TokenServer']}"}
     data = {"game_id": game_id, "score": score}
     
     response = requests.post(url, headers=headers, data=data)
-    print(response.json())
+    print(response.status_code)
 
 def verify_solution(map : Map, solution : list):
     grid = map.map
@@ -35,8 +35,9 @@ def verify_solution(map : Map, solution : list):
         velocity = [velocity[i] + acceleration[i] for i in range(3)]
         position = [position[i] + velocity[i] for i in range(3)]
 
-        for t in range(1, 11):
-            interpolated_position = [previous_position[i] + (position[i] - previous_position[i]) * t / 10 for i in range(3)]
+        division = 100
+        for t in range(1, division + 1):
+            interpolated_position = [previous_position[i] + (position[i] - previous_position[i]) * t / division for i in range(3)]
             interpolated_position_int = [int(round(x)) for x in interpolated_position]
 
             if not (0 <= interpolated_position_int[0] < map.max_x and 0 <= interpolated_position_int[1] < map.max_y and 0 <= interpolated_position_int[2] < map.max_z):
@@ -75,6 +76,8 @@ def score(rep):
         "cleared" : bool,
         "score": float
         }
+    
+    print(f"Game ID : {soluce["game_id"]}")
         
     for i in range(len(soluce["moves"])):
         soluce["moves"][i] = soluce["moves"][i].split(" ")
@@ -102,11 +105,12 @@ if __name__ == "__main__":
             break
         if rep.status_code == 200:
             print(f" {rep.status_code} : Récupération de nouveaux scores")
+            sc = 1
             data = rep.json()
             sc = score(data)
             send_correction(data["game_id"], sc)
         else:
-            print(f"Erreur lors de la récupération des scores : {rep.status_code}")
+            print(f"Erreur lors de la récupération des scores : {rep.json()}")
 
 
 
